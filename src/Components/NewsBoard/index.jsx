@@ -4,18 +4,50 @@ import NewsItem from "../NewsItem";
 
 const NewsBoard = (props) => {
 
-    const [articles, setArticle] = useState([]);
+    // const [articles, setArticle] = useState([]);
+    // const [isDataShow, setIsdataShow] = useState( false );
+
+    const [allvalues, setValues] = useState({
+        articles : [],
+        isDataShow : false
+    })
 
     const {category} = props;
 
 
     useEffect(() => {
 
-        let apiKey = 'f48e2fdbbb234ec9bb00c693eabd339f';
+        // fetch(url).then(response => response.json()).then(data => setArticle(data.articles)).catch( error => console.log(error))
 
-        let url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${apiKey}`;
+        const onFetchNews = async() => {
 
-        fetch(url).then(response => response.json()).then(data => setArticle(data.articles)).catch( error => console.log(error))
+                let apiKey = 'f48e2fdbbb234ec9bb00c693eabd339f';
+
+                let api = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${apiKey}`;
+
+                
+
+                try {
+
+                    const response = await fetch(api);
+
+                    const data = await response.json();
+
+                    if( response.ok === true ){
+
+                        setValues({...allvalues, articles : data.articles, isDataShow : true});
+
+                    }
+                    
+                } 
+                
+                catch (error) {
+                    console.log(error);
+                }
+
+        }
+
+        onFetchNews();
 
     }, [category]);
 
@@ -27,14 +59,19 @@ const NewsBoard = (props) => {
                 <br />
 
                 {
-                    articles.map( (news, index) => {
-                        return <NewsItem    key={index}
-                                            title = {news.title}
-                                            description = {news.description}
-                                            src = {news.urlToImage}
-                                            url = {news.url}
-                                />
-                    })
+                    allvalues.isDataShow ?      allvalues.articles.map( ( each, index ) => {
+
+                                                        return  <NewsItem   key = {index} 
+                                                                            title = {each.title}
+                                                                            description = {each.description}
+                                                                            src = {each.urlToImage}
+                                                                            url = {each.url}
+                                                                    />
+                                                } )
+
+                                            :
+
+                                            null
                 }
         </>
 
